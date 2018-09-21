@@ -209,8 +209,8 @@ int main(int argc, char *argv[])
 	ThreadedCanvasManipulator *image_gen_3 = NULL;
 	ThreadedCanvasManipulator *image_gen_4 = NULL;
 	
-	// for(int i=1;i>0;i++) //INFINI
-	for(int i=0;i<10;i++)	//10x
+	for(int i=1;i>0;i++) //INFINI
+	//for(int i=0;i<10;i++)	//10x
 	{
 		if (demo_parameter_1) {
 		  ImageScroller *scroller = new ImageScroller(matrix,
