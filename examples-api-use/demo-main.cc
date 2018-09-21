@@ -81,8 +81,8 @@ public:
     }
 #undef EXIT_WITH_MSG
     fclose(f);
-    fprintf(stderr, "Read image '%s' with %dx%d\n", filename,
-            new_width, new_height);
+    //fprintf(stderr, "Read image '%s' with %dx%d\n", filename,
+    //        new_width, new_height);
     horizontal_position_ = 0;
     MutexLock l(&mutex_new_image_);
     new_image_.Delete();  // in case we reload faster than is picked up
@@ -114,16 +114,18 @@ public:
             (horizontal_position_ + x) % current_image_.width, y);
           offscreen_->SetPixel(x, y, p.red, p.green, p.blue);
         }
-      }
+      }		
+		usleep(scroll_ms_ * 1000);
+ 
       offscreen_ = matrix_->SwapOnVSync(offscreen_);
-      horizontal_position_ += scroll_jumps_;
+      /*horizontal_position_ += scroll_jumps_;
       if (horizontal_position_ < 0) horizontal_position_ = current_image_.width;
       if (scroll_ms_ <= 0) {
         // No scrolling. We don't need the image anymore.
         current_image_.Delete();
       } else {
         usleep(scroll_ms_ * 1000);
-      }
+      }*/
     }
   }
 
@@ -176,14 +178,23 @@ private:
   RGBMatrix* matrix_;
   FrameCanvas* offscreen_;
 };
+
 // -------------------- MAIN --------------------- //
 int main(int argc, char *argv[]) 
 {
     RGBMatrix::Options matrix_options;
     rgb_matrix::RuntimeOptions runtime_opt;
   
-    int runtime_seconds = 5;
+    int runtime_seconds = 10;
+	const char *demo_parameter_1 = "pika-test-1.ppm";
+	const char *demo_parameter_2 = "pika-test-2.ppm";
+	const char *demo_parameter_3 = "pika-test-3.ppm";
+	const char *demo_parameter_4 = "pika-test-4.ppm";
+	int scroll_ms = 300;
+	int demo = 1;
+
 	
+	matrix_options.cols = 64;
     matrix_options.rows = 32;
     matrix_options.chain_length = 1;
     matrix_options.parallel = 1;
@@ -193,37 +204,105 @@ int main(int argc, char *argv[])
       return 1;
 
     Canvas *canvas = matrix;
-    ThreadedCanvasManipulator *image_gen = NULL;
+    ThreadedCanvasManipulator *image_gen_1 = NULL;
+	ThreadedCanvasManipulator *image_gen_2 = NULL;
+	ThreadedCanvasManipulator *image_gen_3 = NULL;
+	ThreadedCanvasManipulator *image_gen_4 = NULL;
+	
+	// for(int i=1;i>0;i++) //INFINI
+	for(int i=0;i<10;i++)	//10x
+	{
+		if (demo_parameter_1) {
+		  ImageScroller *scroller = new ImageScroller(matrix,
+													  demo,
+													  scroll_ms);
+		  if (!scroller->LoadPPM(demo_parameter_1))
+			return 1;
+		  image_gen_1 = scroller;
+		} else {
+		  fprintf(stderr, "Demo %d Requires PPM image as parameter\n", demo);
+		  return 1;
+		}
 
-    image_gen = new RotatingBlockGenerator(canvas);
+		signal(SIGTERM, InterruptHandler);
+		signal(SIGINT, InterruptHandler);
 
-    signal(SIGTERM, InterruptHandler);
-    signal(SIGINT, InterruptHandler);
+		image_gen_1->Start();
+		
+		usleep(runtime_seconds * 1000);
+		delete image_gen_1;
 
-    image_gen->Start();
+		
+		runtime_seconds = 10;
+		if (demo_parameter_2) {
+		  ImageScroller *scroller = new ImageScroller(matrix,
+													  demo,
+													  scroll_ms);
+		  if (!scroller->LoadPPM(demo_parameter_2))
+			return 1;
+		  image_gen_2 = scroller;
+		} else {
+		  fprintf(stderr, "Demo %d Requires PPM image as parameter\n", demo);
+		  return 1;
+		}
 
-    if (runtime_seconds > 0) {
-        sleep(runtime_seconds);
-      } else {
-        printf("Press <CTRL-C> to exit and reset LEDs\n");
-        while (!interrupt_received) 
-        {
-            if (runtime_seconds > 0) {
-                sleep(runtime_seconds);
-              } else {
-                printf("Press <CTRL-C> to exit and reset LEDs\n");
-                while (!interrupt_received) {
-                  sleep(1);
-                }
-              }
+		signal(SIGTERM, InterruptHandler);
+		signal(SIGINT, InterruptHandler);
+		
+		image_gen_1->Stop();
+		image_gen_2->Start();
 
-              delete image_gen;
-              delete canvas;
-            
-              printf("\%s. Exiting.\n",
-                     interrupt_received ? "Received CTRL-C" : "Timeout reached");
-              return 0;
-        }
+		usleep(runtime_seconds * 1000);
+		delete image_gen_2;
+
+		
+		runtime_seconds = 10;
+
+		if (demo_parameter_3) {
+		  ImageScroller *scroller = new ImageScroller(matrix,
+													  demo,
+													  scroll_ms);
+		  if (!scroller->LoadPPM(demo_parameter_3))
+			return 1;
+		  image_gen_3 = scroller;
+		} else {
+		  fprintf(stderr, "Demo %d Requires PPM image as parameter\n", demo);
+		  return 1;
+		}
+
+		signal(SIGTERM, InterruptHandler);
+		signal(SIGINT, InterruptHandler);
+
+		image_gen_2->Stop();
+		image_gen_3->Start();
+
+		usleep(runtime_seconds * 1000);
+		delete image_gen_3;
+
+		
+		runtime_seconds = 10;
+		
+		if (demo_parameter_4) {
+		  ImageScroller *scroller = new ImageScroller(matrix,
+													  demo,
+													  scroll_ms);
+		  if (!scroller->LoadPPM(demo_parameter_4))
+			return 1;
+		  image_gen_4 = scroller;
+		} else {
+		  fprintf(stderr, "Demo %d Requires PPM image as parameter\n", demo);
+		  return 1;
+		}
+
+		signal(SIGTERM, InterruptHandler);
+		signal(SIGINT, InterruptHandler);
+
+		image_gen_3->Stop();
+		image_gen_4->Start();
+		usleep(runtime_seconds * 1000);
+		delete image_gen_4;
+	
+		
+	}
+
 }
-}
-

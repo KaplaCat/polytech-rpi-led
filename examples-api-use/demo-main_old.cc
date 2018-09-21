@@ -1,3 +1,10 @@
+// -*- mode: c++; c-basic-offset: 2; indent-tabs-mode: nil; -*-
+//
+// This code is public domain
+// (but note, once linked against the led-matrix library, this is
+// covered by the GPL v2)
+//
+// This is a grab-bag of various demos and not very readable.
 #include "led-matrix.h"
 #include "threaded-canvas-manipulator.h"
 #include "pixel-mapper.h"
@@ -261,7 +268,7 @@ public:
     }
 #undef EXIT_WITH_MSG
     fclose(f);
-    fprintf(stderr, "Read image '%s' with %dx%d\n", filename,
+    //fprintf(stderr, "Read image '%s' with %dx%d\n", filename,
             new_width, new_height);
     horizontal_position_ = 0;
     MutexLock l(&mutex_new_image_);
