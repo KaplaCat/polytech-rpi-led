@@ -10,7 +10,7 @@ RGB_INCDIR=$(RGB_LIB_DISTRIBUTION)/include
 RGB_LIBDIR=$(RGB_LIB_DISTRIBUTION)/lib
 RGB_LIBRARY_NAME=rgbmatrix
 RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
-LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIBRARY_NAME) -lrt -lm -lpthread
+MYLDFLAGS = LDFLAGS -L$(RGB_LIBDIR) -l$(RGB_LIBRARY_NAME) -lrt -lm -lpthread
 
 all : $(BINARIES)
 
@@ -18,7 +18,7 @@ $(RGB_LIBRARY): FORCE
 	$(MAKE) -C $(RGB_LIBDIR)
 
 demo : demo-main.o $(RGB_LIBRARY)
-	$(CXX) $< -o $@ $(LDFLAGS)
+	$(CXX) $< -o $@ $(MYLDFLAGS)
 
 minimal-example : minimal-example.o
 input-example : input-example.o
@@ -29,7 +29,7 @@ ledcat : ledcat.o
 
 # All the binaries that have the same name as the object file.q
 % : %.o $(RGB_LIBRARY)
-	$(CXX) $< -o $@ $(LDFLAGS)
+	$(CXX) $< -o $@ $(MYLDFLAGS)
 
 
 # Since the C example uses the C++ library underneath, which depends on C++
