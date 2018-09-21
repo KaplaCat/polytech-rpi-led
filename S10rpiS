@@ -1,2 +1,3 @@
 #!/bin/sh
-./demo &
+cd /usr/bin
+demo &
